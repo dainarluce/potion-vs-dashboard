@@ -279,9 +279,10 @@
 
   <div class="section">
     <div class="stitle">Images sent to Potion by month</div>
-    <div class="sdesc">Every round counted, so this is workload sent, not unique images.</div>
+    <div class="sdesc">Every round counted, so this is workload sent, not unique images. Colored by client code, same as the spend chart. Hover over a segment for the count.</div>
     <div class="card">
       <div class="chart" id="imgChart"></div>
+      <div class="chart-legend" id="imgLegend"></div>
     </div>
   </div>
 
@@ -366,12 +367,18 @@
   }).join("");
   el("spendLegend").innerHTML = A.map(function(a){ return '<span class="lg"><i style="background:'+a.color+'"></i>'+esc(a.name)+'</span>'; }).join("");
 
-  // ---------- images chart ----------
+  // ---------- images chart (stacked by client code, same colors as spend) ----------
   var maxImg = Math.max.apply(null, imgByMonth);
   el("imgChart").innerHTML = M.map(function(m,i){
-    var v = imgByMonth[i];
-    return '<div class="bar-col"><div class="bar-val">'+int(v)+'</div><div class="bar" style="height:'+Math.max(2,v/maxImg*CH).toFixed(1)+'px;flex:none"></div><div class="bar-lbl">'+m+' 2026</div></div>';
+    var segs = A.map(function(a){
+      var v = a.images[i]; if(v <= 0) return "";
+      var h = Math.max(2, v/maxImg*CH);
+      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+int(v)+' images" data-pct="'+(v/imgByMonth[i]*100).toFixed(1)+'"></div>';
+    }).join("");
+    var total = imgByMonth[i];
+    return '<div class="bar-col"><div class="bar-val">'+int(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxImg*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div></div>';
   }).join("");
+  el("imgLegend").innerHTML = el("spendLegend").innerHTML;
 
   // ---------- tables ----------
   var maxAcc6 = 0;
@@ -437,11 +444,13 @@
       tip.style.left = x+"px"; tip.style.top = y+"px"; tip.classList.add("show");
     }
     function hide(){ tip.classList.remove("show"); }
-    var host = el("spendChart");
-    host.addEventListener("mouseover", function(e){ var s = segOf(e); if(s) show(s, e.clientX, e.clientY); });
-    host.addEventListener("mousemove", function(e){ if(!tip.classList.contains("show")) return; tip.style.left = e.clientX+"px"; tip.style.top = e.clientY+"px"; });
-    host.addEventListener("mouseout", function(e){ if(segOf(e)) hide(); });
-    host.addEventListener("click", function(e){ var s = segOf(e); if(!s) return; e.stopPropagation(); var r = s.getBoundingClientRect(); show(s, r.left+r.width/2, r.top); });
+    ["spendChart","imgChart"].forEach(function(id){
+      var host = el(id);
+      host.addEventListener("mouseover", function(e){ var s = segOf(e); if(s) show(s, e.clientX, e.clientY); });
+      host.addEventListener("mousemove", function(e){ if(!tip.classList.contains("show")) return; tip.style.left = e.clientX+"px"; tip.style.top = e.clientY+"px"; });
+      host.addEventListener("mouseout", function(e){ if(segOf(e)) hide(); });
+      host.addEventListener("click", function(e){ var s = segOf(e); if(!s) return; e.stopPropagation(); var r = s.getBoundingClientRect(); show(s, r.left+r.width/2, r.top); });
+    });
     document.addEventListener("click", hide);
   })();
 
