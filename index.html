@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potion — Victoria's Secret Usage &amp; Spend</title>
+<!-- Set the theme before first paint so a light-mode reload never flashes dark. -->
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem("potionvs-theme");
+    if(t !== "light" && t !== "dark"){
+      t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+    }
+    document.documentElement.setAttribute("data-theme", t);
+  }catch(e){ document.documentElement.setAttribute("data-theme","dark"); }
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* Dark is the default. Every colour that differs between themes lives here as a
+     variable, so the light theme below only has to restate values, never rules. */
+  :root{
+    color-scheme:dark;
+    --bg:#080d1a; --card:#111b30; --card2:#0f1830; --line:#1e2b45; --line2:#26375a;
+    --blue:#3698E8; --sky:#7CC0F4; --muted:#8ea3c4; --muted2:#6a7ea0; --white:#eef4fc;
+    --green:#3ecf8e; --amber:#e8a63e; --red:#e8613e; --orange:#f2843e;
+    --strong:#ffffff;                 /* headings and key figures */
+    --bar-from:#7CC0F4; --bar-to:#3698E8;
+    --hatch1:#1c2947; --hatch2:#233255;
+    --skel1:#182543; --skel2:#233350;
+    --btn1:#16233d; --btn2:#111b30; --btn1h:#1a2a49; --btn2h:#141f38;
+    --tint:rgba(54,152,232,.06); --tint2:rgba(54,152,232,.05);
+    --err-bg:rgba(232,97,62,.1); --err-bd:rgba(232,97,62,.45); --err-fg:#ffd9d0;
+    --warn-bg:rgba(232,166,62,.1); --warn-bd:rgba(232,166,62,.45); --warn-fg:#ffeccd;
+    --code-bg:rgba(0,0,0,.3); --code-bd:rgba(255,255,255,.12);
+    --shadow:none;
+  }
+  [data-theme="light"]{
+    color-scheme:light;
+    --bg:#f4f6fa; --card:#ffffff; --card2:#fbfcfe; --line:#e5e9f1; --line2:#d3dae6;
+    --blue:#1b6fb5; --sky:#17618f; --muted:#5a6a84; --muted2:#78879f; --white:#111827;
+    --green:#0e8f5a; --amber:#9a6206; --red:#c0410f; --orange:#b8560f;
+    --strong:#0b1220;
+    --bar-from:#78b5e9; --bar-to:#1b6fb5;
+    --hatch1:#eef2f8; --hatch2:#e1e8f2;
+    --skel1:#e7ecf4; --skel2:#dae2ed;
+    --btn1:#ffffff; --btn2:#f3f6fb; --btn1h:#ffffff; --btn2h:#e9f1fa;
+    --tint:rgba(27,111,181,.07); --tint2:rgba(27,111,181,.05);
+    --err-bg:#fdeeea; --err-bd:rgba(192,65,15,.35); --err-fg:#7c2d12;
+    --warn-bg:#fdf6e7; --warn-bd:rgba(154,98,6,.35); --warn-fg:#6f4106;
+    --code-bg:rgba(0,0,0,.06); --code-bd:rgba(0,0,0,.13);
+    --shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg); color:var(--white); font-family:'Work Sans',sans-serif; padding:30px; line-height:1.5;
+    transition:background-color .2s ease, color .2s ease; overflow-x:hidden;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  .label{font-family:'Work Sans';font-weight:600;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--sky);margin-bottom:10px;}
+  .label .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:9px;vertical-align:1px;
+    box-shadow:0 0 0 0 rgba(232,97,62,.55);animation:rec-pulse 1.8s ease-out infinite;}
+  @keyframes rec-pulse{0%{box-shadow:0 0 0 0 rgba(232,97,62,.55);}70%{box-shadow:0 0 0 6px rgba(232,97,62,0);}100%{box-shadow:0 0 0 0 rgba(232,97,62,0);}}
+  @media(prefers-reduced-motion:reduce){.label .dot{animation:none;}}
+
+  h1{font-family:'Inter';font-weight:800;font-size:30px;letter-spacing:-.5px;color:var(--strong);}
+  .sub{font-size:14px;color:var(--muted);margin-top:8px;max-width:720px;}
+  .links{display:flex;flex-wrap:wrap;column-gap:20px;row-gap:4px;}
+  .sheetlink{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:500;color:var(--blue);
+    text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s;}
+  .sheetlink:hover{border-bottom-color:var(--blue);}
+  .sheetlink .arrow{font-size:11px;}
+
+  /* header bar */
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .refresh{display:flex;align-items:center;flex-wrap:wrap;gap:12px;flex-shrink:0;margin-top:4px;}
+  .stamp{font-size:11px;color:var(--muted2);letter-spacing:.3px;text-align:right;}
+  button.rl{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg,var(--btn1),var(--btn2));
+    border:1px solid var(--line2);border-radius:10px;color:var(--white);font-family:'Work Sans',sans-serif;
+    font-weight:600;font-size:12.5px;padding:10px 16px;cursor:pointer;box-shadow:var(--shadow);
+    transition:border-color .15s,background .15s;}
+  button.rl:hover:not(:disabled){border-color:var(--blue);background:linear-gradient(180deg,var(--btn1h),var(--btn2h));}
+  button.rl:disabled{opacity:.6;cursor:default;}
+  button.rl svg{width:14px;height:14px;}
+  body.loading button#reload svg{animation:spin .9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ghost / skeleton loading */
+  .skel{display:inline-block;color:transparent!important;border-radius:6px;vertical-align:middle;
+    background:linear-gradient(90deg,var(--skel1) 25%,var(--skel2) 50%,var(--skel1) 75%);background-size:200% 100%;
+    animation:shimmer 1.3s ease-in-out infinite;}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .skel.bar{background:linear-gradient(180deg,var(--skel2),var(--skel1));animation:pulse 1.3s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:.9}}
+  @media(prefers-reduced-motion:reduce){.skel,.skel.bar,body.loading button#reload svg{animation:none}}
+  /* a failed fetch leaves placeholders on screen — stop them looking like they're still loading */
+  body.failed .skel{animation:none;opacity:.3;}
+
+  .err{display:none;background:var(--err-bg);border:1px solid var(--err-bd);border-radius:12px;
+    padding:14px 16px;margin-top:22px;font-size:13px;color:var(--err-fg);}
+  .err b{color:var(--strong);}
+  .err code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--code-bg);
+    border:1px solid var(--code-bd);border-radius:4px;padding:1px 5px;color:var(--strong);}
+  .err.show{display:block;}
+  .warn-banner{display:none;background:var(--warn-bg);border:1px solid var(--warn-bd);
+    border-radius:12px;padding:14px 16px;margin-top:22px;font-size:13px;color:var(--warn-fg);}
+  .warn-banner b{color:var(--strong);}
+  .warn-banner.show{display:block;}
+  .warn-banner ul{margin:6px 0 0 18px;}
+
+  .section{margin-top:38px;}
+  .stitle{font-family:'Inter';font-weight:700;font-size:16px;color:var(--strong);margin-bottom:4px;}
+  .sdesc{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .kpis.kpis3{grid-template-columns:repeat(3,1fr);}
+  .kpi{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);}
+  .kpi .k{font-size:12.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted2);font-weight:600;}
+  .kpi .v{font-family:'Inter';font-weight:800;font-size:25px;color:var(--strong);margin-top:8px;}
+  .kpi .d{font-size:11.5px;color:var(--muted);margin-top:5px;}
+  .kpi.warn .v{color:var(--amber);}
+
+  /* chart card */
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:16px;padding:22px 24px;box-shadow:var(--shadow);}
+  .chart{display:flex;align-items:flex-end;gap:18px;height:180px;margin-top:10px;padding:0 6px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:44px;}
+  /* Squeezing 7+ months into a narrow screen just overlaps the labels — scroll
+     the chart horizontally instead, same pattern as the vendor table below. */
+  @media(max-width:820px){
+    .chart{overflow-x:auto;overflow-y:hidden;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+    .bar-col{flex:0 0 66px;}
+    /* "January 2026" is wider than one scrolling column — wrap it to two
+       lines instead of letting it spill into the next bar's space. */
+    .bar-lbl{white-space:normal;text-align:center;}
+  }
+  .bar{width:100%;max-width:64px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--bar-from),var(--bar-to));transition:height .5s ease;overflow:hidden;}
+  .bar.empty{background:repeating-linear-gradient(135deg,var(--hatch1),var(--hatch1) 6px,var(--hatch2) 6px,var(--hatch2) 12px);border:1px dashed var(--line2);}
+  .bar-stack{display:flex;flex-direction:column-reverse;width:100%;height:100%;}
+  .bar-seg{width:100%;}
+  .chart-legend{display:flex;flex-wrap:wrap;gap:14px 20px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);}
+  .chart-legend .lg{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--muted);}
+  .chart-legend .lg i{display:inline-block;width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+  /* Colors invert relative to the page — dark chip on light mode, light chip on
+     dark mode — same trick a printed label uses to always read against its page. */
+  .seg-tip{position:fixed;left:0;top:0;pointer-events:none;z-index:50;
+    background:var(--strong);color:var(--bg);font-family:'Work Sans',sans-serif;
+    padding:13px 17px;border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.25);
+    opacity:0;transform:translate(-50%,calc(-100% - 12px));transition:opacity .1s ease;
+    white-space:nowrap;}
+  .seg-tip.show{opacity:1;}
+  .seg-tip b{display:block;font-size:19px;font-weight:700;}
+  /* Full-strength color and now full weight on both lines too — a real
+     reviewer still called the previous version (16px/14.5px, 700/600) hard
+     to read, so the size step-down is doing the hierarchy work alone now. */
+  /* Named .amt, not .sub — .sub is already the page-subtitle class elsewhere
+     on the page (color:var(--muted)), and reusing it here let that muted
+     gray silently leak into the tooltip instead of the intended full-contrast
+     color. color:inherit pins it to the parent's color defensively either way. */
+  .seg-tip .amt{display:block;font-size:17px;font-weight:700;margin-top:5px;color:inherit;}
+  .bar-val{font-family:'Inter';font-weight:700;font-size:11.5px;color:var(--strong);margin-bottom:6px;}
+  .bar-val.dim{color:var(--muted2);font-weight:600;}
+  .bar-lbl{margin-top:9px;font-size:11.5px;color:var(--muted);font-weight:500;white-space:nowrap;}
+
+  /* table */
+  .tscroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;margin-top:6px;}
+  th{text-align:left;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;}
+  th.num, td.num{text-align:right;}
+  td{padding:11px 10px;font-size:13px;color:var(--white);border-bottom:1px solid var(--line);white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr.total td{font-weight:700;color:var(--strong);border-top:1px solid var(--line2);border-bottom:none;background:var(--tint);}
+  .vname{font-weight:600;}
+  tr.grouphead td{font-weight:600;color:var(--strong);}
+  td.gname{font-family:'Inter';font-weight:700;font-size:12.5px;letter-spacing:.3px;}
+  td.vname.sub{padding-left:28px;font-weight:500;}
+  .flag{display:inline-block;font-size:10px;color:var(--muted2);margin-left:6px;}
+
+  .footnote{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:11px;color:var(--muted2);letter-spacing:.2px;}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr;}.kpis.kpis3{grid-template-columns:1fr 1fr;}}
+  @media(max-width:480px){
+    body{padding:18px 14px;}
+    .card{padding:16px 14px;}
+    h1{font-size:24px;}
+    .kpis,.kpis.kpis3{grid-template-columns:1fr;}
+    .kpi .v{font-size:21px;}
+    /* flex-shrink:0 on .refresh (set for desktop, where it must not get
+       squeezed by a long title) instead let it push past the edge of the
+       page here — it needs to be allowed to shrink so its own wrap can
+       actually kick in within the available width. */
+    .refresh{flex-shrink:1;width:100%;}
+  }
+
+  /* Password gate — a courtesy lock for people who already have the link and
+     the password, not real security. Anyone can view-source and find it;
+     that's an accepted tradeoff for a small trusted-team dashboard, not a bug. */
+  .gate{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;
+    align-items:center;justify-content:center;padding:20px;}
+  .gate.unlocked{display:none;}
+  .gate-card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:16px;padding:32px 28px;max-width:340px;width:100%;text-align:center;box-shadow:var(--shadow);}
+  .gate-card .label{justify-content:center;}
+  .gate-card h2{font-family:'Inter';font-weight:800;font-size:19px;color:var(--strong);margin:14px 0 6px;}
+  .gate-card p{font-size:13px;color:var(--muted);margin-bottom:18px;}
+  .gate-card input{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);
+    border-radius:10px;padding:11px 14px;font-size:14px;color:var(--strong);font-family:'Work Sans',sans-serif;
+    text-align:center;letter-spacing:1px;}
+  .gate-card input:focus{outline:none;border-color:var(--blue);}
+  .gate-card button{width:100%;margin-top:12px;background:linear-gradient(180deg,var(--btn1),var(--btn2));
+    border:1px solid var(--line2);border-radius:10px;color:var(--white);font-family:'Work Sans',sans-serif;
+    font-weight:600;font-size:13.5px;padding:11px;cursor:pointer;}
+  .gate-card button:hover{border-color:var(--blue);}
+  .gate-err{display:none;font-size:12.5px;color:var(--red);margin-top:10px;}
+  .gate-err.show{display:block;}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:9px;vertical-align:0;}
+  td.num b{font-weight:700;}
+  .note-list{margin:6px 0 0 18px;font-size:13px;color:var(--muted);line-height:1.7;}
+  .note-list li{margin-bottom:4px;}
+  .note-list b{color:var(--strong);}
+  .tag-draft{display:inline-block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:600;
+    color:var(--green);border:1px solid var(--green);border-radius:20px;padding:3px 10px;margin-left:10px;vertical-align:3px;}
+  .bar-seg{cursor:default;}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <form class="gate-card" id="gateForm">
+    <div class="label"><span class="dot"></span>Potion Usage Report</div>
+    <h2>This report is private</h2>
+    <p>Enter the password to continue.</p>
+    <input type="password" id="gatePw" autocomplete="current-password" placeholder="Password" autofocus>
+    <button type="submit">Unlock</button>
+    <div class="gate-err" id="gateErr">Wrong password — try again.</div>
+  </form>
+</div>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem("potionvs-unlocked") === "1"){
+      document.write('<style>#gate{display:none!important}</style>');
+    }
+  }catch(e){}
+})();
+</script>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <div class="label"><span class="dot"></span>Potion Usage Report · Victoria's Secret</div>
+      <h1>Potion — Victoria's Secret Usage &amp; Spend</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="refresh">
+      <div class="stamp" id="stamp"></div>
+      <button class="rl" id="theme" type="button" title="Switch background">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+        <span id="themeLabel">Light</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="warn-banner show" id="warn"></div>
+
+  <div class="section">
+    <div class="stitle">Summary</div>
+    <div class="sdesc">What Duggal has spent at Potion on Victoria's Secret and Pink</div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+
+  <div class="section">
+    <div class="stitle">Spend by month and account</div>
+    <div class="sdesc">Total paid to Potion each month, colored by client code. Hover over a bar segment for the exact amount and percent.</div>
+    <div class="card">
+      <div class="chart" id="spendChart"></div>
+      <div class="chart-legend" id="spendLegend"></div>
+      <div class="seg-tip" id="segTip"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="stitle">Images sent to Potion by month</div>
+    <div class="sdesc">Every round counted, so this is workload sent, not unique images.</div>
+    <div class="card">
+      <div class="chart" id="imgChart"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="stitle">Where the spend goes</div>
+      <div class="sdesc">By client code, last six months and year to date.</div>
+      <div class="tscroll"><table id="accTable"></table></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="stitle">Month by month</div>
+      <div class="sdesc">Service months. Potion invoices them the following month.</div>
+      <div class="tscroll"><table id="monthTable"></table></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="stitle">What the numbers show</div>
+      <ul class="note-list" id="obs"></ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="stitle">Method and notes</div>
+      <ul class="note-list" id="notes"></ul>
+    </div>
+  </div>
+
+  <div class="footnote">Built with ♥ by Daina</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DATA = {"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"], "updated": "Oct 29, 2026", "notes": ["Source: Potion hourly buyout invoices 3113–3152 (Jan–Sep 2026), line by line. Only Victoria’s Secret and Pink lines are included.", "Potion’s hourly invoices also include other accounts (GAP, BBW in-store, EA and others). They are not included here: this report covers Victoria’s Secret and Pink only (58 hourly lines, $9,266, not shown).", "Cross-check: the Potion schedule sheet lists 6,201 Victoria’s Secret and Pink images for the same months, within 1% of the invoice quantity above.", "Months are service months (the month the work closed). Potion invoices them the following month.", "“Images sent” is the quantity on each invoice line and counts every round, so a job sent for three rounds counts its images three times. It measures workload sent to Potion, not unique images.", "Each Potion invoice line is matched to its client code by order number, using the 2026 order list of each account. Where an order is not on a list, the job code is used (PKD = 98852, DU5 = 98853, DU6 = 12603, DU8 = 12601 or 12608)."], "accounts": [{"name": "12603 – VS Digital", "color": "#3698E8", "spend": [2042.0, 12034.0, 3059.0, 1880.0, 13985.0, 1966.0, 18.0, 17176.0, 8950.0], "images": [189, 660, 180, 42, 648, 269, 1, 653, 739]}, {"name": "98853 – Pink Digital", "color": "#E4577F", "spend": [6888.57, 7946.0, 1492.0, 328.0, 12994.5, 785.0, 98.0, 11496.0, 7197.0], "images": [299, 460, 113, 11, 611, 48, 3, 411, 488]}, {"name": "12601 – VS Service Co. (Print)", "color": "#8fa8dd", "spend": [1143.0, 1063.0, 455.0, 118.0, 678.0, 8.0, 329.0, 912.0, 356.0], "images": [61, 72, 19, 8, 33, 1, 13, 45, 32]}, {"name": "98852 – Pink (Print)", "color": "#F2B600", "spend": [890.0, 105.0, 30.0, 58.0, 24.0, 0.0, 0.0, 594.0, 759.0], "images": [38, 10, 1, 1, 1, 0, 0, 15, 70]}, {"name": "12608 – VS Global", "color": "#2EA05A", "spend": [0.0, 0.0, 0.0, 343.0, 122.0, 0.0, 0.0, 153.0, 308.0], "images": [0, 0, 0, 10, 4, 0, 0, 4, 13]}]};
+
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  // Round halves to even so every figure matches the PDF report to the dollar.
+  function rnd(n){ var r = Math.round(n); if(Math.abs(n % 1) === 0.5 && r % 2 !== 0) r -= 1; return r; }
+  function usd(n){ return "$"+rnd(n).toLocaleString("en-US"); }
+  function usd2(n){ return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function int(n){ return rnd(n).toLocaleString("en-US"); }
+  function sum(a){ return a.reduce(function(x,y){return x+y;},0); }
+
+  var M = DATA.months, A = DATA.accounts, N = M.length;
+  var spendByMonth = M.map(function(_,i){ return sum(A.map(function(a){ return a.spend[i]; })); });
+  var imgByMonth   = M.map(function(_,i){ return sum(A.map(function(a){ return a.images[i]; })); });
+  var SY = sum(spendByMonth), IY = sum(imgByMonth);
+  var L6 = M.map(function(_,i){return i;}).slice(N-6);
+  var S6 = sum(L6.map(function(i){return spendByMonth[i];})), I6 = sum(L6.map(function(i){return imgByMonth[i];}));
+
+  // ---------- header ----------
+  el("sub").textContent = "January–September 2026. Only Victoria's Secret and Pink jobs. October is not included until Potion's invoice arrives.";
+  el("stamp").textContent = "Updated "+DATA.updated;
+  el("warn").innerHTML = "<b>October isn't included yet.</b> October is not closed with Potion, so it, and the 2026 Fashion Show work, are left out. This report will be updated when the invoice arrives.";
+
+  // ---------- KPIs ----------
+  function kpi(k,v,d){ return '<div class="kpi"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>'; }
+  el("kpis").innerHTML =
+    kpi("VS spend with Potion", usd(SY), "Jan–Sep 2026") +
+    kpi("Images sent to Potion", int(IY), "all rounds, Jan–Sep") +
+    kpi("Last 6 months", usd(S6), "Apr–Sep · "+int(I6)+" images") +
+    kpi("Avg cost per image", usd2(SY/IY), "Potion rate: $12 / hour");
+
+  // ---------- stacked spend chart ----------
+  var maxSpend = Math.max.apply(null, spendByMonth);
+  var CH = 150; // px available for the tallest bar
+  el("spendChart").innerHTML = M.map(function(m,i){
+    var segs = A.map(function(a){
+      var v = a.spend[i]; if(v <= 0) return "";
+      var h = Math.max(2, v/maxSpend*CH);
+      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+usd2(v)+'" data-pct="'+(v/spendByMonth[i]*100).toFixed(1)+'"></div>';
+    }).join("");
+    var total = spendByMonth[i];
+    return '<div class="bar-col"><div class="bar-val">'+usd(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxSpend*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div></div>';
+  }).join("");
+  el("spendLegend").innerHTML = A.map(function(a){ return '<span class="lg"><i style="background:'+a.color+'"></i>'+esc(a.name)+'</span>'; }).join("");
+
+  // ---------- images chart ----------
+  var maxImg = Math.max.apply(null, imgByMonth);
+  el("imgChart").innerHTML = M.map(function(m,i){
+    var v = imgByMonth[i];
+    return '<div class="bar-col"><div class="bar-val">'+int(v)+'</div><div class="bar" style="height:'+Math.max(2,v/maxImg*CH).toFixed(1)+'px;flex:none"></div><div class="bar-lbl">'+m+' 2026</div></div>';
+  }).join("");
+
+  // ---------- tables ----------
+  var maxAcc6 = 0;
+  var rows = A.map(function(a){
+    var s6 = sum(L6.map(function(i){return a.spend[i];})), i6 = sum(L6.map(function(i){return a.images[i];}));
+    var sy = sum(a.spend), iy = sum(a.images);
+    if(s6 > maxAcc6) maxAcc6 = s6;
+    return {a:a,s6:s6,i6:i6,sy:sy,iy:iy};
+  });
+  el("accTable").innerHTML =
+    '<tr><th>Client code</th><th class="num">6-mo spend</th><th class="num">Share</th><th class="num">6-mo images</th><th class="num">Avg / image</th><th class="num">YTD spend</th><th class="num">YTD images</th></tr>' +
+    rows.map(function(r){
+      return '<tr><td class="vname"><span class="sw" style="background:'+r.a.color+'"></span>'+esc(r.a.name)+'</td>'+
+        '<td class="num">'+usd(r.s6)+'</td><td class="num">'+(r.s6/S6*100).toFixed(1)+'%</td><td class="num">'+int(r.i6)+'</td>'+
+        '<td class="num">'+usd2(r.s6/r.i6)+'</td><td class="num">'+usd(r.sy)+'</td><td class="num">'+int(r.iy)+'</td></tr>';
+    }).join("") +
+    '<tr class="total"><td>Total Victoria\'s Secret</td><td class="num">'+usd(S6)+'</td><td class="num">100%</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+usd(SY)+'</td><td class="num">'+int(IY)+'</td></tr>';
+
+  el("monthTable").innerHTML =
+    '<tr><th>Month</th><th class="num">VS spend</th><th class="num">Images sent</th><th class="num">Avg cost / image</th></tr>' +
+    M.map(function(m,i){
+      return '<tr><td class="vname">'+m+' 2026</td><td class="num">'+usd2(spendByMonth[i])+'</td><td class="num">'+int(imgByMonth[i])+'</td><td class="num">'+(imgByMonth[i]?usd2(spendByMonth[i]/imgByMonth[i]):"–")+'</td></tr>';
+    }).join("") +
+    '<tr class="total"><td>Jan–Sep total</td><td class="num">'+usd2(SY)+'</td><td class="num">'+int(IY)+'</td><td class="num">'+usd2(SY/IY)+'</td></tr>' +
+    '<tr class="total"><td>Last 6 months (Apr–Sep)</td><td class="num">'+usd2(S6)+'</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td></tr>';
+
+  // ---------- observations + notes ----------
+  var peaks = M.map(function(m,i){return i;}).filter(function(i){return spendByMonth[i] > 15000;});
+  var quiet = M.map(function(m,i){return i;}).filter(function(i){return spendByMonth[i] < 6000;});
+  var dig = (sum(A[0].spend)+sum(A[1].spend))/SY*100;
+  var peakSp = peaks.map(function(i){return spendByMonth[i];}), peakIm = peaks.map(function(i){return imgByMonth[i];});
+  el("obs").innerHTML = [
+    "<b>Most of the year's spend is recent.</b> April to September is "+usd(S6)+", "+Math.round(S6/SY*100)+"% of the "+usd(SY)+" spent on Victoria's Secret and Pink from January to September.",
+    "<b>Spend follows the campaign calendar.</b> "+peaks.map(function(i){return M[i];}).join(", ")+" each ran between "+usd(Math.min.apply(null,peakSp))+" and "+usd(Math.max.apply(null,peakSp))+", with "+int(Math.min.apply(null,peakIm))+"–"+int(Math.max.apply(null,peakIm))+" images sent per month. The quiet months were "+quiet.map(function(i){return M[i]+" ("+usd(spendByMonth[i])+")";}).join(", ")+".",
+    "<b>The two Digital accounts drive it.</b> 12603 VS Digital and 98853 Pink Digital are "+Math.round(dig)+"% of VS spend year to date. The three Print and Global accounts together are only "+Math.round(100-dig)+"%.",
+    "<b>October is not included.</b> October is not closed with Potion yet. The invoice arrives in early November, so October is left out of these numbers, including the 2026 Fashion Show work."
+  ].map(function(t){return "<li>"+t+"</li>";}).join("");
+  el("notes").innerHTML = DATA.notes.map(function(t){return "<li>"+esc(t)+"</li>";}).join("");
+
+  // ---------- theme ----------
+  var ICON = {
+    light: '<circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.6v2M12 19.4v2M2.6 12h2M19.4 12h2M5.4 5.4l1.4 1.4M17.2 17.2l1.4 1.4M18.6 5.4l-1.4 1.4M6.8 17.2l-1.4 1.4"></path>',
+    dark:  '<path d="M20.8 13.4A8.4 8.4 0 1 1 10.6 3.2a6.6 6.6 0 0 0 10.2 10.2z"></path>'
+  };
+  function currentTheme(){ return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark"; }
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    var next = t === "light" ? "dark" : "light";
+    el("themeIcon").innerHTML = ICON[next];
+    el("themeLabel").textContent = next === "light" ? "Light" : "Dark";
+    el("theme").title = "Switch to the "+next+" background";
+    try{ localStorage.setItem("potionvs-theme", t); }catch(e){}
+  }
+  applyTheme(currentTheme());
+  el("theme").addEventListener("click", function(){ applyTheme(currentTheme() === "light" ? "dark" : "light"); });
+
+  // ---------- bar-segment tooltips (hover on desktop, tap on phone) ----------
+  (function(){
+    var tip = el("segTip");
+    function segOf(e){ return e.target.closest ? e.target.closest(".bar-seg") : null; }
+    function show(s, x, y){
+      tip.innerHTML = "<b>"+esc(s.dataset.label)+"</b><span class=\"amt\">"+esc(s.dataset.amt)+" · "+esc(s.dataset.pct)+"%</span>";
+      tip.style.left = x+"px"; tip.style.top = y+"px"; tip.classList.add("show");
+    }
+    function hide(){ tip.classList.remove("show"); }
+    var host = el("spendChart");
+    host.addEventListener("mouseover", function(e){ var s = segOf(e); if(s) show(s, e.clientX, e.clientY); });
+    host.addEventListener("mousemove", function(e){ if(!tip.classList.contains("show")) return; tip.style.left = e.clientX+"px"; tip.style.top = e.clientY+"px"; });
+    host.addEventListener("mouseout", function(e){ if(segOf(e)) hide(); });
+    host.addEventListener("click", function(e){ var s = segOf(e); if(!s) return; e.stopPropagation(); var r = s.getBoundingClientRect(); show(s, r.left+r.width/2, r.top); });
+    document.addEventListener("click", hide);
+  })();
+
+  // ---------- password gate ----------
+  // A courtesy lock, not real security: anyone can view-source and read it.
+  var GATE_PASSWORD = "potion2026";
+  el("gateForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var pw = el("gatePw").value.trim().toLowerCase();
+    if(pw === GATE_PASSWORD){
+      try{ localStorage.setItem("potionvs-unlocked", "1"); }catch(err){}
+      el("gate").classList.add("unlocked");
+      el("gateErr").classList.remove("show");
+    } else {
+      el("gateErr").classList.add("show");
+      el("gatePw").focus(); el("gatePw").select();
+    }
+  });
+})();
+</script>
+</body>
+</html>
