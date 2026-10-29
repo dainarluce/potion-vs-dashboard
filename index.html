@@ -221,6 +221,10 @@
   .tag-draft{display:inline-block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:600;
     color:var(--green);border:1px solid var(--green);border-radius:20px;padding:3px 10px;margin-left:10px;vertical-align:3px;}
   .bar-seg{cursor:default;}
+  #spendChart{height:262px;}
+  .bar-sub{margin-top:3px;font-size:11px;color:var(--muted2);font-weight:500;white-space:nowrap;}
+  .bar-lbl + .bar-sub{margin-top:5px;}
+  @media(max-width:820px){ #spendChart .bar-col{flex:0 0 92px;} }
 </style>
 </head>
 <body>
@@ -269,20 +273,11 @@
 
   <div class="section">
     <div class="stitle">Spend by month and account</div>
-    <div class="sdesc">Total paid to Potion each month, colored by client code. Hover over a bar segment for the exact amount and percent.</div>
+    <div class="sdesc">Total paid to Potion each month, colored by client code. Under each month: images sent (every round counted, so workload, not unique images) and that month's share of the Jan–Sep spend. Hover over a bar segment for the amount, images and percent for that client code.</div>
     <div class="card">
       <div class="chart" id="spendChart"></div>
       <div class="chart-legend" id="spendLegend"></div>
       <div class="seg-tip" id="segTip"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="stitle">Images sent to Potion by month</div>
-    <div class="sdesc">Every round counted, so this is workload sent, not unique images. Colored by client code, same as the spend chart. Hover over a segment for the count.</div>
-    <div class="card">
-      <div class="chart" id="imgChart"></div>
-      <div class="chart-legend" id="imgLegend"></div>
     </div>
   </div>
 
@@ -353,32 +348,19 @@
     kpi("Last 6 months", usd(S6), "Apr–Sep · "+int(I6)+" images") +
     kpi("Avg cost per image", usd2(SY/IY), "Potion rate: $12 / hour");
 
-  // ---------- stacked spend chart ----------
+  // ---------- stacked spend chart: images + share of the year under each month ----------
   var maxSpend = Math.max.apply(null, spendByMonth);
   var CH = 150; // px available for the tallest bar
   el("spendChart").innerHTML = M.map(function(m,i){
     var segs = A.map(function(a){
       var v = a.spend[i]; if(v <= 0) return "";
       var h = Math.max(2, v/maxSpend*CH);
-      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+usd2(v)+'" data-pct="'+(v/spendByMonth[i]*100).toFixed(1)+'"></div>';
+      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+usd2(v)+' · '+int(a.images[i])+' images" data-pct="'+(v/spendByMonth[i]*100).toFixed(1)+'"></div>';
     }).join("");
     var total = spendByMonth[i];
-    return '<div class="bar-col"><div class="bar-val">'+usd(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxSpend*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div></div>';
+    return '<div class="bar-col"><div class="bar-val">'+usd(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxSpend*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div><div class="bar-sub">'+int(imgByMonth[i])+' images</div><div class="bar-sub">'+(total/SY*100).toFixed(1)+'% of total</div></div>';
   }).join("");
   el("spendLegend").innerHTML = A.map(function(a){ return '<span class="lg"><i style="background:'+a.color+'"></i>'+esc(a.name)+'</span>'; }).join("");
-
-  // ---------- images chart (stacked by client code, same colors as spend) ----------
-  var maxImg = Math.max.apply(null, imgByMonth);
-  el("imgChart").innerHTML = M.map(function(m,i){
-    var segs = A.map(function(a){
-      var v = a.images[i]; if(v <= 0) return "";
-      var h = Math.max(2, v/maxImg*CH);
-      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+int(v)+' images" data-pct="'+(v/imgByMonth[i]*100).toFixed(1)+'"></div>';
-    }).join("");
-    var total = imgByMonth[i];
-    return '<div class="bar-col"><div class="bar-val">'+int(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxImg*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div></div>';
-  }).join("");
-  el("imgLegend").innerHTML = el("spendLegend").innerHTML;
 
   // ---------- tables ----------
   var maxAcc6 = 0;
@@ -444,7 +426,7 @@
       tip.style.left = x+"px"; tip.style.top = y+"px"; tip.classList.add("show");
     }
     function hide(){ tip.classList.remove("show"); }
-    ["spendChart","imgChart"].forEach(function(id){
+    ["spendChart"].forEach(function(id){
       var host = el(id);
       host.addEventListener("mouseover", function(e){ var s = segOf(e); if(s) show(s, e.clientX, e.clientY); });
       host.addEventListener("mousemove", function(e){ if(!tip.classList.contains("show")) return; tip.style.left = e.clientX+"px"; tip.style.top = e.clientY+"px"; });
