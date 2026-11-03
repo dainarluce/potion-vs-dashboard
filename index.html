@@ -334,7 +334,7 @@
   <div class="section">
     <div class="card">
       <div class="stitle">By client code: spend and hours</div>
-      <div class="sdesc">Last six months (Apr–Sep) and year to date (Jan–Sep).</div>
+      <div class="sdesc">Last six months (April to September).</div>
       <div class="tscroll"><table id="accTable"></table></div>
     </div>
   </div>
@@ -506,13 +506,13 @@
     return {a:a,s6:s6,i6:i6,sy:sy,iy:iy};
   });
   el("accTable").innerHTML =
-    '<tr><th>Client code</th><th class="num">6-mo spend</th><th class="num">% of 6-mo spend</th><th class="num">6-mo images</th><th class="num">Avg cost / image</th><th class="num">YTD spend</th><th class="num">YTD images</th><th class="num">YTD hours</th></tr>' +
+    '<tr><th>Client code</th><th class="num">6-mo spend</th><th class="num">% of 6-mo spend</th><th class="num">6-mo images</th><th class="num">Avg cost / image</th><th class="num">6-mo hours</th></tr>' +
     rows.map(function(r){
       return '<tr><td class="vname"><span class="sw" style="background:'+r.a.color+'"></span>'+esc(r.a.name)+'</td>'+
         '<td class="num">'+usd(r.s6)+'</td><td class="num">'+(r.s6/S6*100).toFixed(1)+'%</td><td class="num">'+int(r.i6)+'</td>'+
-        '<td class="num">'+usd2(r.s6/r.i6)+'</td><td class="num">'+usd(r.sy)+'</td><td class="num">'+int(r.iy)+'</td><td class="num">'+int(r.sy/12)+'</td></tr>';
+        '<td class="num">'+usd2(r.s6/r.i6)+'</td><td class="num">'+int(r.s6/12)+'</td></tr>';
     }).join("") +
-    '<tr class="total"><td>Total Victoria\'s Secret</td><td class="num">'+usd(S6)+'</td><td class="num">100%</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+usd(SY)+'</td><td class="num">'+int(IY)+'</td><td class="num">'+int(SY/12)+'</td></tr>';
+    '<tr class="total"><td>Total Victoria\'s Secret</td><td class="num">'+usd(S6)+'</td><td class="num">100%</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+int(S6/12)+'</td></tr>';
 
   el("monthTable").innerHTML =
     '<tr><th>Month</th><th class="num">VS spend</th><th class="num">Hours</th><th class="num">Images sent</th><th class="num">Avg cost / image</th><th class="num">Avg time / image</th></tr>' +
