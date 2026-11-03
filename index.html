@@ -291,11 +291,9 @@
     </div>
   </div>
 
-  <div class="warn-banner show" id="warn"></div>
 
   <div class="section">
     <div class="stitle">The short version</div>
-    <div class="sdesc">Five things to know, in plain English: time per image first, then cost.</div>
     <div class="card"><ul class="quick" id="quick"></ul></div>
   </div>
 
@@ -396,9 +394,8 @@
   var S6 = sum(L6.map(function(i){return spendByMonth[i];})), I6 = sum(L6.map(function(i){return imgByMonth[i];}));
 
   // ---------- header ----------
-  el("sub").textContent = "January–September 2026. Only Victoria's Secret and Pink jobs. October is not included until Potion's invoice arrives.";
+  el("sub").textContent = "January 1 to September 30, 2026. Victoria's Secret Regular (Print, Digital, Global) and Pink (Print and Digital).";
   el("stamp").textContent = "Updated "+DATA.updated;
-  el("warn").innerHTML = "<b>October isn't included yet.</b> October is not closed with Potion, so it, and the 2026 Fashion Show work, are left out. This report will be updated when the invoice arrives.";
 
   // ---------- hours, groups, rounds (hours = invoice $ / $12) ----------
   function hm(min){ var h=Math.floor(min/60), m=Math.round(min-h*60); if(m===60){h+=1;m=0;} return h ? (h+" h"+(m?" "+m+" min":"")) : (m+" min"); }
@@ -535,8 +532,7 @@
     "<b>The two Digital accounts drive it.</b> 12603 VS Digital and 98853 Pink Digital are "+Math.round(digH)+"% of the hours and "+Math.round(dig)+"% of the spend. The three Print and Global accounts together are only "+Math.round(100-dig)+"%.",
     "<b>Hours follow the campaign calendar.</b> The busiest months were "+M[busiest[0]]+" ("+int(spendByMonth[busiest[0]]/12)+" h) and "+M[busiest[1]]+" ("+int(spendByMonth[busiest[1]]/12)+" h). The quiet months were "+quiet.map(function(i){return M[i]+" ("+int(spendByMonth[i]/12)+" h)";}).join(", ")+".",
     "<b>A new image costs about "+usd(RT.r1[1]*12/RT.r1[0])+" and takes about "+hm(rmin("r1"))+"; a correction costs about "+usd(RT.r2[1]*12/RT.r2[0])+" and takes about "+hm(rmin("r2"))+".</b> Across all lines the average is "+hm(ALL.min)+" and "+usd2(SY/IY)+" per image.",
-    "<b>Most of the year's spend is recent.</b> April to September is "+usd(S6)+", "+Math.round(S6/SY*100)+"% of the "+usd(SY)+" spent on Victoria's Secret and Pink from January to September.",
-    "<b>October is not included.</b> October is not closed with Potion yet. The invoice arrives in early November, so October is left out of these numbers, including the 2026 Fashion Show work."
+    "<b>Most of the year's spend is recent.</b> April to September is "+usd(S6)+", "+Math.round(S6/SY*100)+"% of the "+usd(SY)+" spent on Victoria's Secret and Pink from January to September."
   ].map(function(t){return "<li>"+t+"</li>";}).join("");
   el("notes").innerHTML = DATA.notes.map(function(t){return "<li>"+esc(t)+"</li>";}).join("");
 
