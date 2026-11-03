@@ -10,10 +10,10 @@
   try{
     var t = localStorage.getItem("potionvs-theme");
     if(t !== "light" && t !== "dark"){
-      t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark";
+      t = "light"; // shared links open in the light version; the toggle still lets anyone switch
     }
     document.documentElement.setAttribute("data-theme", t);
-  }catch(e){ document.documentElement.setAttribute("data-theme","dark"); }
+  }catch(e){ document.documentElement.setAttribute("data-theme","light"); }
 })();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
