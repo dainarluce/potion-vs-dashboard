@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Potion — Victoria's Secret Usage &amp; Spend</title>
+<title>Potion — Victoria's Secret &amp; Pink: Usage, Hours &amp; Spend</title>
 <!-- Set the theme before first paint so a light-mode reload never flashes dark. -->
 <script>
 (function(){
@@ -225,6 +225,30 @@
   .bar-sub{margin-top:3px;font-size:11px;color:var(--muted2);font-weight:500;white-space:nowrap;}
   .bar-lbl + .bar-sub{margin-top:5px;}
   @media(max-width:820px){ #spendChart .bar-col{flex:0 0 92px;} }
+
+  /* ---- v2: hours, groups, rounds ---- */
+  .quick{list-style:none;margin:0;padding:0;}
+  .quick li{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:var(--muted);padding:9px 0;border-bottom:1px solid var(--line);}
+  .quick li:last-child{border-bottom:none;}
+  .quick li .n{flex:0 0 26px;height:26px;border-radius:7px;background:var(--tint);color:var(--blue);font-family:'Inter';font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+  .quick b{color:var(--strong);}
+  .kpis + .kpis{margin-top:14px;}
+  .grp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grp{min-width:0;background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-top:4px solid var(--gc);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);}
+  .grp-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .grp-t{font-family:'Inter';font-weight:800;font-size:17px;color:var(--strong);}
+  .grp-s{font-size:12.5px;color:var(--muted);font-weight:600;}
+  .grp-v{font-family:'Inter';font-weight:800;font-size:30px;color:var(--strong);margin-top:8px;}
+  .grp-v small{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px;}
+  .grp-d{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .grp-bar{height:8px;border-radius:5px;background:var(--line);margin:14px 0 10px;overflow:hidden;}
+  .grp-bar i{display:block;height:100%;background:var(--gc);border-radius:5px;}
+  .grp table{margin-top:4px;} .grp td,.grp th{padding:9px 6px;}
+  .seg-toggle{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin-bottom:6px;}
+  .seg-toggle button{background:transparent;border:none;color:var(--muted);font-family:'Work Sans',sans-serif;font-weight:600;font-size:12.5px;padding:8px 16px;cursor:pointer;}
+  .seg-toggle button.on{background:var(--blue);color:#fff;}
+  .kpi .d b{color:var(--strong);}
+  @media(max-width:820px){.grp-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -251,7 +275,7 @@
   <div class="topbar">
     <div>
       <div class="label"><span class="dot"></span>Potion Usage Report · Victoria's Secret</div>
-      <h1>Potion — Victoria's Secret Usage &amp; Spend</h1>
+      <h1>Potion — Victoria's Secret &amp; Pink: Usage, Hours &amp; Spend</h1>
       <div class="sub" id="sub"></div>
       <div class="links">
         <a class="sheetlink" href="https://drive.google.com/drive/folders/1hq2lf4kbHFyWIKKMKRnNLhfHsVeWXU0H?usp=sharing"
@@ -270,15 +294,39 @@
   <div class="warn-banner show" id="warn"></div>
 
   <div class="section">
-    <div class="stitle">Summary</div>
-    <div class="sdesc">What Duggal has spent at Potion on Victoria's Secret and Pink</div>
-    <div class="kpis" id="kpis"></div>
+    <div class="stitle">The short version</div>
+    <div class="sdesc">Five things to know, in plain English: time per image first, then cost.</div>
+    <div class="card"><ul class="quick" id="quick"></ul></div>
   </div>
 
   <div class="section">
-    <div class="stitle">Spend by month and account</div>
-    <div class="sdesc">Total paid to Potion each month, colored by client code. Under each month: images sent (every round counted, so workload, not unique images) and that month's share of the Jan–Sep spend. Hover over a bar segment for the amount, images and percent for that client code.</div>
+    <div class="stitle">Summary</div>
+    <div class="sdesc">How long Potion takes per image on Victoria's Secret and Pink, and what it costs, January to September 2026.</div>
+    <div class="kpis" id="kpis"></div>
+    <div class="kpis" id="kpis2"></div>
+  </div>
+
+  <div class="section">
+    <div class="stitle">Time and cost per image: VS Regular vs Pink</div>
+    <div class="sdesc">How long Potion takes per image and what it costs, for each group and each client code. Time is the hours Potion billed (invoice amount ÷ $12) divided by the images sent.</div>
+    <div class="grp-grid" id="groups"></div>
+  </div>
+
+  <div class="section">
+    <div class="stitle">New image vs correction</div>
+    <div class="sdesc">Time per image by round. A new image (round 1) takes much longer than a correction round (round 2 and later).</div>
+    <div class="kpis kpis3" id="roundKpis"></div>
+    <div class="card" style="margin-top:14px">
+      <div class="tscroll"><table id="roundTable"></table></div>
+      <div class="sdesc" style="margin:12px 0 0" id="roundNote"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="stitle">By month</div>
+    <div class="sdesc">Choose Spend or Hours. Colored by client code. Under each month: images sent (every round counted, so workload, not unique images) and that month's share of the Jan–Sep total. Hover over (or tap) a segment for the amount, images and percent for that client code.</div>
     <div class="card">
+      <div class="seg-toggle" id="metricToggle"><button type="button" data-m="spend" class="on">Spend ($)</button><button type="button" data-m="hours">Hours</button></div>
       <div class="chart" id="spendChart"></div>
       <div class="chart-legend" id="spendLegend"></div>
       <div class="seg-tip" id="segTip"></div>
@@ -287,8 +335,8 @@
 
   <div class="section">
     <div class="card">
-      <div class="stitle">Where the spend goes</div>
-      <div class="sdesc">By client code, last six months and year to date.</div>
+      <div class="stitle">By client code: spend and hours</div>
+      <div class="sdesc">Last six months (Apr–Sep) and year to date (Jan–Sep).</div>
       <div class="tscroll"><table id="accTable"></table></div>
     </div>
   </div>
@@ -298,6 +346,14 @@
       <div class="stitle">Month by month</div>
       <div class="sdesc">Service months. Potion invoices them the following month.</div>
       <div class="tscroll"><table id="monthTable"></table></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="card">
+      <div class="stitle">Not every order goes to Potion</div>
+      <div class="sdesc">Orders that did not go to Potion were done in-house at Duggal, mostly pick-ups (small changes on an image that already went through Potion, opened as a new job) and CGI images. The cost of the original image is already counted in its original Potion order.</div>
+      <div class="tscroll"><table id="ordersTable"></table></div>
     </div>
   </div>
 
@@ -321,7 +377,7 @@
 <script>
 (function(){
   "use strict";
-  var DATA = {"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"], "updated": "Oct 29, 2026", "notes": ["Source: Potion hourly buyout invoices 3113–3152 (Jan–Sep 2026), line by line. Only Victoria’s Secret and Pink lines are included.", "Potion’s hourly invoices also include other accounts (GAP, BBW in-store, EA and others). They are not included here: this report covers Victoria’s Secret and Pink only (58 hourly lines, $9,266, not shown).", "Cross-check: the Potion schedule sheet lists 6,201 Victoria’s Secret and Pink images for the same months, within 1% of the invoice quantity above.", "Months are service months (the month the work closed). Potion invoices them the following month.", "“Images sent” is the quantity on each invoice line and counts every round, so a job sent for three rounds counts its images three times. It measures workload sent to Potion, not unique images.", "Each Potion invoice line is matched to its client code by order number, using the 2026 order list of each account. Where an order is not on a list, the job code is used (PKD = 98852, DU5 = 98853, DU6 = 12603, DU8 = 12601 or 12608)."], "accounts": [{"name": "12603 – VS Digital", "color": "#3698E8", "spend": [2042.0, 12034.0, 3059.0, 1880.0, 13985.0, 1966.0, 18.0, 17176.0, 8950.0], "images": [189, 660, 180, 42, 648, 269, 1, 653, 739]}, {"name": "98853 – Pink Digital", "color": "#E4577F", "spend": [6888.57, 7946.0, 1492.0, 328.0, 12994.5, 785.0, 98.0, 11496.0, 7197.0], "images": [299, 460, 113, 11, 611, 48, 3, 411, 488]}, {"name": "12601 – VS Service Co. (Print)", "color": "#8fa8dd", "spend": [1143.0, 1063.0, 455.0, 118.0, 678.0, 8.0, 329.0, 912.0, 356.0], "images": [61, 72, 19, 8, 33, 1, 13, 45, 32]}, {"name": "98852 – Pink (Print)", "color": "#F2B600", "spend": [890.0, 105.0, 30.0, 58.0, 24.0, 0.0, 0.0, 594.0, 759.0], "images": [38, 10, 1, 1, 1, 0, 0, 15, 70]}, {"name": "12608 – VS Global", "color": "#2EA05A", "spend": [0.0, 0.0, 0.0, 343.0, 122.0, 0.0, 0.0, 153.0, 308.0], "images": [0, 0, 0, 10, 4, 0, 0, 4, 13]}]};
+  var DATA = {"months": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"], "updated": "Nov 3, 2026", "notes": ["Source: Potion hourly buyout invoices 3113–3152 (Jan–Sep 2026), line by line. Only Victoria’s Secret and Pink lines are included.", "Hours = the invoice amount ÷ $12, Potion’s hourly rate. They are the hours Potion billed on each invoice line, not a timesheet per image.", "“% of total hours” is each client code’s or group’s share of the 9,899 hours. It is a share of hours only, not of images or dollars.", "Round 1 and round 2+ come from Potion’s return file name on each invoice line (x1a_PT = round 1, x2a_PT and later = round 2+). Only about a third of the images carry that label, mostly May, June and August. Lines without it are shown as “not labelled” and are not guessed.", "Not every order goes to Potion. Orders that did not go to Potion were done in-house at Duggal, mostly pick-ups (small changes on an image that already went through Potion, opened as a new job) and CGI images. The cost of the original image is already counted in its original Potion order. Order counts come from the 2026 order list of each client code.", "Potion’s hourly invoices also include other accounts (GAP, BBW in-store, EA and others). They are not included here: this report covers Victoria’s Secret and Pink only (58 hourly lines, $9,266, not shown).", "Cross-check: the Potion schedule sheet lists 6,201 Victoria’s Secret and Pink images for the same months, within 1% of the invoice quantity.", "Months are service months (the month the work closed). Potion invoices them the following month.", "“Images sent” is the quantity on each invoice line and counts every round, so a job sent for three rounds counts its images three times. It measures workload sent to Potion, not unique images.", "Each Potion invoice line is matched to its client code by order number, using the 2026 order list of each account. Where an order is not on a list, the job code is used (PKD = 98852, DU5 = 98853, DU6 = 12603, DU8 = 12601 or 12608)."], "accounts": [{"name": "12603 – VS Digital", "color": "#3698E8", "spend": [2042.0, 12034.0, 3059.0, 1880.0, 13985.0, 1966.0, 18.0, 17176.0, 8950.0], "images": [189, 660, 180, 42, 648, 269, 1, 653, 739], "group": "VS Regular", "type": "Digital", "orders": 78, "sent": 64, "rounds": {"r1": [734, 1822.75], "r2": [546, 392.25], "un": [2101, 2877.5]}}, {"name": "98853 – Pink Digital", "color": "#E4577F", "spend": [6888.57, 7946.0, 1492.0, 328.0, 12994.5, 785.0, 98.0, 11496.0, 7197.0], "images": [299, 460, 113, 11, 611, 48, 3, 411, 488], "group": "Pink", "type": "Digital", "orders": 81, "sent": 65, "rounds": {"r1": [577, 1346.54], "r2": [86, 49.92], "un": [1781, 2705.63]}}, {"name": "12601 – VS Service Co. (Print)", "color": "#8fa8dd", "spend": [1143.0, 1063.0, 455.0, 118.0, 678.0, 8.0, 329.0, 912.0, 356.0], "images": [61, 72, 19, 8, 33, 1, 13, 45, 32], "group": "VS Regular", "type": "Print", "orders": 176, "sent": 39, "rounds": {"r1": [61, 112.25], "r2": [28, 33.42], "un": [195, 276.17]}}, {"name": "98852 – Pink (Print)", "color": "#F2B600", "spend": [890.0, 105.0, 30.0, 58.0, 24.0, 0.0, 0.0, 594.0, 759.0], "images": [38, 10, 1, 1, 1, 0, 0, 15, 70], "group": "Pink", "type": "Print", "orders": 95, "sent": 24, "rounds": {"r1": [15, 49.25], "r2": [0, 0.0], "un": [121, 155.75]}}, {"name": "12608 – VS Global", "color": "#2EA05A", "spend": [0.0, 0.0, 0.0, 343.0, 122.0, 0.0, 0.0, 153.0, 308.0], "images": [0, 0, 0, 10, 4, 0, 0, 4, 13], "group": "VS Regular", "type": "Global", "orders": 16, "sent": 6, "rounds": {"r1": [6, 19.5], "r2": [0, 0.0], "un": [25, 57.67]}}]};
 
   function el(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
@@ -344,27 +400,104 @@
   el("stamp").textContent = "Updated "+DATA.updated;
   el("warn").innerHTML = "<b>October isn't included yet.</b> October is not closed with Potion, so it, and the 2026 Fashion Show work, are left out. This report will be updated when the invoice arrives.";
 
+  // ---------- hours, groups, rounds (hours = invoice $ / $12) ----------
+  function hm(min){ var h=Math.floor(min/60), m=Math.round(min-h*60); if(m===60){h+=1;m=0;} return h ? (h+" h"+(m?" "+m+" min":"")) : (m+" min"); }
+  function stat(list){
+    var sp=0, im=0, od=0, se=0;
+    list.forEach(function(a){ sp+=sum(a.spend); im+=sum(a.images); od+=a.orders; se+=a.sent; });
+    return {spend:sp, hours:sp/12, images:im, min:sp/12*60/im, orders:od, sent:se};
+  }
+  var ALL = stat(A), GR = {}, GNAMES = ["VS Regular","Pink"], GCOL = {"VS Regular":"#3698E8","Pink":"#E4577F"};
+  GNAMES.forEach(function(g){ GR[g] = stat(A.filter(function(a){return a.group===g;})); });
+  var RT = {r1:[0,0], r2:[0,0], un:[0,0]};
+  A.forEach(function(a){ ["r1","r2","un"].forEach(function(k){ RT[k][0]+=a.rounds[k][0]; RT[k][1]+=a.rounds[k][1]; }); });
+  function rmin(k){ return RT[k][1]*60/RT[k][0]; }
+  var labelled = (RT.r1[0]+RT.r2[0])/IY*100;
+  var digH = (sum(A.filter(function(a){return a.type==="Digital";}).map(function(a){return sum(a.spend);}))/12)/ALL.hours*100;
+  var digSent = A.filter(function(a){return a.type==="Digital";});
+  var printA = A.filter(function(a){return a.type==="Print";});
+
+  // ---------- the short version ----------
+  var DG = A.filter(function(a){return a.type==="Digital";});
+  el("quick").innerHTML = [
+    "<b>Potion takes about "+hm(ALL.min)+" per image on average,</b> and it costs about "+usd2(SY/IY)+" per image ($12 per hour). That covers "+int(IY)+" images, January to September.",
+    "<b>VS Regular: "+hm(GR["VS Regular"].min)+" per image ("+usd2(GR["VS Regular"].spend/GR["VS Regular"].images)+"). Pink: "+hm(GR["Pink"].min)+" per image ("+usd2(GR["Pink"].spend/GR["Pink"].images)+").</b> VS Regular is 12601 (Print), 12603 (Digital) and 12608 (Global). Pink is 98852 (Print) and 98853 (Digital). Each client code is below.",
+    "<b>A new image takes about "+hm(rmin("r1"))+" ("+usd(RT.r1[1]*12/RT.r1[0])+"); a correction round about "+hm(rmin("r2"))+" ("+usd(RT.r2[1]*12/RT.r2[0])+").</b>",
+    "<b>Total: "+int(ALL.hours)+" hours and "+usd(SY)+".</b> VS Regular is "+Math.round(GR["VS Regular"].hours/ALL.hours*100)+"% of the hours and Pink "+Math.round(GR["Pink"].hours/ALL.hours*100)+"%. The two Digital accounts are "+Math.round(digH)+"% of all hours.",
+    "<b>Not every order goes to Potion.</b> "+Math.round(DG.reduce(function(x,a){return x+a.sent;},0)/DG.reduce(function(x,a){return x+a.orders;},0)*100)+"% of Digital orders went to Potion; the Print accounts are mostly done in-house. Pick-ups and CGI are done at Duggal."
+  ].map(function(t,i){ return '<li><span class="n">'+(i+1)+'</span><span>'+t+'</span></li>'; }).join("");
+
   // ---------- KPIs ----------
   function kpi(k,v,d){ return '<div class="kpi"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="d">'+d+'</div></div>'; }
   el("kpis").innerHTML =
-    kpi("VS spend with Potion", usd(SY), "Jan–Sep 2026") +
+    kpi("Avg time per image", hm(ALL.min), usd2(SY/IY)+" per image · all VS + Pink") +
+    kpi("VS Regular · time per image", hm(GR["VS Regular"].min), usd2(GR["VS Regular"].spend/GR["VS Regular"].images)+" per image") +
+    kpi("Pink · time per image", hm(GR["Pink"].min), usd2(GR["Pink"].spend/GR["Pink"].images)+" per image") +
+    kpi("New image · round 1", hm(rmin("r1")), "a correction (round 2+) takes "+hm(rmin("r2")));
+  el("kpis2").innerHTML =
+    kpi("Total cost at Potion", usd(SY), "Jan–Sep 2026 · $12 / hour") +
+    kpi("Hours used", int(ALL.hours), "VS Regular "+int(GR["VS Regular"].hours)+" · Pink "+int(GR["Pink"].hours)) +
     kpi("Images sent to Potion", int(IY), "all rounds, Jan–Sep") +
-    kpi("Last 6 months", usd(S6), "Apr–Sep · "+int(I6)+" images") +
-    kpi("Avg cost per image", usd2(SY/IY), "Potion rate: $12 / hour");
+    kpi("Last 6 months", usd(S6), "Apr–Sep · "+int(I6)+" images");
 
-  // ---------- stacked spend chart: images + share of the year under each month ----------
-  var maxSpend = Math.max.apply(null, spendByMonth);
-  var CH = 150; // px available for the tallest bar
-  el("spendChart").innerHTML = M.map(function(m,i){
-    var segs = A.map(function(a){
-      var v = a.spend[i]; if(v <= 0) return "";
-      var h = Math.max(2, v/maxSpend*CH);
-      return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+usd2(v)+' · '+int(a.images[i])+' images" data-pct="'+(v/spendByMonth[i]*100).toFixed(1)+'"></div>';
-    }).join("");
-    var total = spendByMonth[i];
-    return '<div class="bar-col"><div class="bar-val">'+usd(total)+'</div><div class="bar-stack" style="height:'+Math.max(2,total/maxSpend*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div><div class="bar-sub">'+int(imgByMonth[i])+' images</div><div class="bar-sub">'+(total/SY*100).toFixed(1)+'% of total</div></div>';
+  // ---------- VS Regular vs Pink cards ----------
+  el("groups").innerHTML = GNAMES.map(function(g){
+    var st = GR[g], rows = A.filter(function(a){return a.group===g;}).slice().sort(function(x,y){return sum(y.spend)-sum(x.spend);});
+    return '<div class="grp" style="--gc:'+GCOL[g]+'">'+
+      '<div class="grp-h"><span class="grp-t">'+g+'</span><span class="grp-s">'+Math.round(st.hours/ALL.hours*100)+'% of total hours</span></div>'+
+      '<div class="grp-v">'+hm(st.min)+'<small>per image</small></div>'+
+      '<div class="grp-d">'+usd2(st.spend/st.images)+' per image · '+int(st.images)+' images · '+int(st.hours)+' hours · '+usd(st.spend)+' total</div>'+
+      '<div class="grp-bar"><i style="width:'+(st.hours/ALL.hours*100).toFixed(1)+'%"></i></div>'+
+      '<div class="tscroll"><table><tr><th>Client code</th><th class="num">Time / image</th><th class="num">Cost / image</th><th class="num">Images</th><th class="num">Hours</th><th class="num">Total cost</th></tr>'+
+      rows.map(function(a){ var sp=sum(a.spend), h=sp/12, im=sum(a.images);
+        return '<tr><td class="vname"><span class="sw" style="background:'+a.color+'"></span>'+esc(a.name)+'</td><td class="num"><b>'+hm(h*60/im)+'</b></td><td class="num">'+usd2(sp/im)+'</td><td class="num">'+int(im)+'</td><td class="num">'+int(h)+'</td><td class="num">'+usd(sp)+'</td></tr>'; }).join("")+
+      '</table></div></div>';
   }).join("");
+
+  // ---------- stacked chart (spend or hours): images + share under each month ----------
+  var METRIC = "spend", CH = 150;
+  function drawChart(){
+    var hrsMode = METRIC === "hours";
+    function val(a,i){ return hrsMode ? a.spend[i]/12 : a.spend[i]; }
+    var tot = M.map(function(_,i){ return sum(A.map(function(a){ return val(a,i); })); });
+    var grand = sum(tot), maxV = Math.max.apply(null, tot);
+    el("spendChart").innerHTML = M.map(function(m,i){
+      var segs = A.map(function(a){
+        var v = val(a,i); if(v <= 0) return "";
+        var h = Math.max(2, v/maxV*CH);
+        var amt = hrsMode ? int(v)+" hours" : usd2(v);
+        return '<div class="bar-seg" style="height:'+h.toFixed(1)+'px;background:'+a.color+'" data-label="'+esc(a.name)+'" data-amt="'+amt+' · '+int(a.images[i])+' images" data-pct="'+(v/tot[i]*100).toFixed(1)+'"></div>';
+      }).join("");
+      return '<div class="bar-col"><div class="bar-val">'+(hrsMode?int(tot[i])+" h":usd(tot[i]))+'</div><div class="bar-stack" style="height:'+Math.max(2,tot[i]/maxV*CH).toFixed(1)+'px;flex:none;border-radius:8px 8px 4px 4px;overflow:hidden">'+segs+'</div><div class="bar-lbl">'+m+' 2026</div><div class="bar-sub">'+int(imgByMonth[i])+' images</div><div class="bar-sub">'+(tot[i]/grand*100).toFixed(1)+'% of total</div></div>';
+    }).join("");
+    Array.prototype.forEach.call(el("metricToggle").querySelectorAll("button"), function(b){ b.classList.toggle("on", b.dataset.m === METRIC); });
+  }
+  drawChart();
+  Array.prototype.forEach.call(el("metricToggle").querySelectorAll("button"), function(b){
+    b.addEventListener("click", function(){ METRIC = b.dataset.m; drawChart(); });
+  });
   el("spendLegend").innerHTML = A.map(function(a){ return '<span class="lg"><i style="background:'+a.color+'"></i>'+esc(a.name)+'</span>'; }).join("");
+
+  // ---------- time per image by round ----------
+  el("roundKpis").innerHTML =
+    kpi("New image · round 1", hm(rmin("r1")), "about "+usd(RT.r1[1]*12/RT.r1[0])+" per image · "+int(RT.r1[0])+" images") +
+    kpi("Correction · round 2 and later", hm(rmin("r2")), "about "+usd(RT.r2[1]*12/RT.r2[0])+" per image · "+int(RT.r2[0])+" images") +
+    kpi("All lines blended", hm(ALL.min), "about "+usd(SY/IY)+" per image · "+int(IY)+" images");
+  el("roundTable").innerHTML =
+    '<tr><th>Client code</th><th class="num">Round 1 images</th><th class="num">Round 1 time / image</th><th class="num">Round 2+ images</th><th class="num">Round 2+ time / image</th><th class="num">All lines time / image</th></tr>' +
+    A.map(function(a){
+      var r1=a.rounds.r1, r2=a.rounds.r2, all=sum(a.spend)/12*60/sum(a.images);
+      return '<tr><td class="vname"><span class="sw" style="background:'+a.color+'"></span>'+esc(a.name)+'</td><td class="num">'+int(r1[0])+'</td><td class="num">'+(r1[0]?hm(r1[1]*60/r1[0]):"–")+'</td><td class="num">'+int(r2[0])+'</td><td class="num">'+(r2[0]?hm(r2[1]*60/r2[0]):"–")+'</td><td class="num">'+hm(all)+'</td></tr>';
+    }).join("") +
+    '<tr class="total"><td>Total VS + Pink</td><td class="num">'+int(RT.r1[0])+'</td><td class="num">'+hm(rmin("r1"))+'</td><td class="num">'+int(RT.r2[0])+'</td><td class="num">'+hm(rmin("r2"))+'</td><td class="num">'+hm(ALL.min)+'</td></tr>';
+  el("roundNote").innerHTML = "<b>How to read it:</b> a correction round takes about "+Math.round(rmin("r2")/rmin("r1")*100)+"% of a first pass. The round is read from Potion's return file name, and only about "+Math.round(labelled)+"% of the images carry that label (mostly May, June and August). The rest are not guessed, so \"all lines\" is the most complete average. Hours are billed per invoice line, so these are averages, not a timesheet per image.";
+
+  // ---------- orders sent vs done in-house ----------
+  el("ordersTable").innerHTML =
+    '<tr><th>Client code</th><th class="num">Orders</th><th class="num">Sent to Potion</th><th class="num">Done in-house</th><th class="num">% done in-house</th></tr>' +
+    A.map(function(a){ var ih=a.orders-a.sent;
+      return '<tr><td class="vname"><span class="sw" style="background:'+a.color+'"></span>'+esc(a.name)+'</td><td class="num">'+int(a.orders)+'</td><td class="num">'+int(a.sent)+'</td><td class="num">'+int(ih)+'</td><td class="num">'+Math.round(ih/a.orders*100)+'%</td></tr>'; }).join("") +
+    '<tr class="total"><td>Total VS + Pink</td><td class="num">'+int(ALL.orders)+'</td><td class="num">'+int(ALL.sent)+'</td><td class="num">'+int(ALL.orders-ALL.sent)+'</td><td class="num">'+Math.round((ALL.orders-ALL.sent)/ALL.orders*100)+'%</td></tr>';
 
   // ---------- tables ----------
   var maxAcc6 = 0;
@@ -375,31 +508,34 @@
     return {a:a,s6:s6,i6:i6,sy:sy,iy:iy};
   });
   el("accTable").innerHTML =
-    '<tr><th>Client code</th><th class="num">6-mo spend</th><th class="num">Share</th><th class="num">6-mo images</th><th class="num">Avg / image</th><th class="num">YTD spend</th><th class="num">YTD images</th></tr>' +
+    '<tr><th>Client code</th><th class="num">6-mo spend</th><th class="num">% of 6-mo spend</th><th class="num">6-mo images</th><th class="num">Avg cost / image</th><th class="num">YTD spend</th><th class="num">YTD images</th><th class="num">YTD hours</th></tr>' +
     rows.map(function(r){
       return '<tr><td class="vname"><span class="sw" style="background:'+r.a.color+'"></span>'+esc(r.a.name)+'</td>'+
         '<td class="num">'+usd(r.s6)+'</td><td class="num">'+(r.s6/S6*100).toFixed(1)+'%</td><td class="num">'+int(r.i6)+'</td>'+
-        '<td class="num">'+usd2(r.s6/r.i6)+'</td><td class="num">'+usd(r.sy)+'</td><td class="num">'+int(r.iy)+'</td></tr>';
+        '<td class="num">'+usd2(r.s6/r.i6)+'</td><td class="num">'+usd(r.sy)+'</td><td class="num">'+int(r.iy)+'</td><td class="num">'+int(r.sy/12)+'</td></tr>';
     }).join("") +
-    '<tr class="total"><td>Total Victoria\'s Secret</td><td class="num">'+usd(S6)+'</td><td class="num">100%</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+usd(SY)+'</td><td class="num">'+int(IY)+'</td></tr>';
+    '<tr class="total"><td>Total Victoria\'s Secret</td><td class="num">'+usd(S6)+'</td><td class="num">100%</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+usd(SY)+'</td><td class="num">'+int(IY)+'</td><td class="num">'+int(SY/12)+'</td></tr>';
 
   el("monthTable").innerHTML =
-    '<tr><th>Month</th><th class="num">VS spend</th><th class="num">Images sent</th><th class="num">Avg cost / image</th></tr>' +
+    '<tr><th>Month</th><th class="num">VS spend</th><th class="num">Hours</th><th class="num">Images sent</th><th class="num">Avg cost / image</th><th class="num">Avg time / image</th></tr>' +
     M.map(function(m,i){
-      return '<tr><td class="vname">'+m+' 2026</td><td class="num">'+usd2(spendByMonth[i])+'</td><td class="num">'+int(imgByMonth[i])+'</td><td class="num">'+(imgByMonth[i]?usd2(spendByMonth[i]/imgByMonth[i]):"–")+'</td></tr>';
+      return '<tr><td class="vname">'+m+' 2026</td><td class="num">'+usd2(spendByMonth[i])+'</td><td class="num">'+int(spendByMonth[i]/12)+'</td><td class="num">'+int(imgByMonth[i])+'</td><td class="num">'+(imgByMonth[i]?usd2(spendByMonth[i]/imgByMonth[i]):"–")+'</td><td class="num">'+(imgByMonth[i]?int(spendByMonth[i]/12*60/imgByMonth[i])+" min":"–")+'</td></tr>';
     }).join("") +
-    '<tr class="total"><td>Jan–Sep total</td><td class="num">'+usd2(SY)+'</td><td class="num">'+int(IY)+'</td><td class="num">'+usd2(SY/IY)+'</td></tr>' +
-    '<tr class="total"><td>Last 6 months (Apr–Sep)</td><td class="num">'+usd2(S6)+'</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td></tr>';
+    '<tr class="total"><td>Jan–Sep total</td><td class="num">'+usd2(SY)+'</td><td class="num">'+int(SY/12)+'</td><td class="num">'+int(IY)+'</td><td class="num">'+usd2(SY/IY)+'</td><td class="num">'+int(SY/12*60/IY)+' min</td></tr>' +
+    '<tr class="total"><td>Last 6 months (Apr–Sep)</td><td class="num">'+usd2(S6)+'</td><td class="num">'+int(S6/12)+'</td><td class="num">'+int(I6)+'</td><td class="num">'+usd2(S6/I6)+'</td><td class="num">'+int(S6/12*60/I6)+' min</td></tr>';
 
   // ---------- observations + notes ----------
   var peaks = M.map(function(m,i){return i;}).filter(function(i){return spendByMonth[i] > 15000;});
   var quiet = M.map(function(m,i){return i;}).filter(function(i){return spendByMonth[i] < 6000;});
   var dig = (sum(A[0].spend)+sum(A[1].spend))/SY*100;
   var peakSp = peaks.map(function(i){return spendByMonth[i];}), peakIm = peaks.map(function(i){return imgByMonth[i];});
+  var busiest = M.map(function(m,i){return i;}).sort(function(x,y){return spendByMonth[y]-spendByMonth[x];});
   el("obs").innerHTML = [
+    "<b>"+int(ALL.hours)+" Potion hours in nine months</b> on Victoria's Secret and Pink: "+int(GR["VS Regular"].hours)+" on VS Regular ("+Math.round(GR["VS Regular"].hours/ALL.hours*100)+"%) and "+int(GR["Pink"].hours)+" on Pink ("+Math.round(GR["Pink"].hours/ALL.hours*100)+"%).",
+    "<b>The two Digital accounts drive it.</b> 12603 VS Digital and 98853 Pink Digital are "+Math.round(digH)+"% of the hours and "+Math.round(dig)+"% of the spend. The three Print and Global accounts together are only "+Math.round(100-dig)+"%.",
+    "<b>Hours follow the campaign calendar.</b> The busiest months were "+M[busiest[0]]+" ("+int(spendByMonth[busiest[0]]/12)+" h) and "+M[busiest[1]]+" ("+int(spendByMonth[busiest[1]]/12)+" h). The quiet months were "+quiet.map(function(i){return M[i]+" ("+int(spendByMonth[i]/12)+" h)";}).join(", ")+".",
+    "<b>A new image costs about "+usd(RT.r1[1]*12/RT.r1[0])+" and takes about "+hm(rmin("r1"))+"; a correction costs about "+usd(RT.r2[1]*12/RT.r2[0])+" and takes about "+hm(rmin("r2"))+".</b> Across all lines the average is "+hm(ALL.min)+" and "+usd2(SY/IY)+" per image.",
     "<b>Most of the year's spend is recent.</b> April to September is "+usd(S6)+", "+Math.round(S6/SY*100)+"% of the "+usd(SY)+" spent on Victoria's Secret and Pink from January to September.",
-    "<b>Spend follows the campaign calendar.</b> "+peaks.map(function(i){return M[i];}).join(", ")+" each ran between "+usd(Math.min.apply(null,peakSp))+" and "+usd(Math.max.apply(null,peakSp))+", with "+int(Math.min.apply(null,peakIm))+"–"+int(Math.max.apply(null,peakIm))+" images sent per month. The quiet months were "+quiet.map(function(i){return M[i]+" ("+usd(spendByMonth[i])+")";}).join(", ")+".",
-    "<b>The two Digital accounts drive it.</b> 12603 VS Digital and 98853 Pink Digital are "+Math.round(dig)+"% of VS spend year to date. The three Print and Global accounts together are only "+Math.round(100-dig)+"%.",
     "<b>October is not included.</b> October is not closed with Potion yet. The invoice arrives in early November, so October is left out of these numbers, including the 2026 Fashion Show work."
   ].map(function(t){return "<li>"+t+"</li>";}).join("");
   el("notes").innerHTML = DATA.notes.map(function(t){return "<li>"+esc(t)+"</li>";}).join("");
