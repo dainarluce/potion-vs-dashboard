@@ -480,7 +480,7 @@
   el("roundKpis").innerHTML =
     kpi("New image · round 1", hm(rmin("r1")), "about "+usd(RT.r1[1]*12/RT.r1[0])+" per image · "+int(RT.r1[0])+" images") +
     kpi("Correction · round 2 and later", hm(rmin("r2")), "about "+usd(RT.r2[1]*12/RT.r2[0])+" per image · "+int(RT.r2[0])+" images") +
-    kpi("All lines blended", hm(ALL.min), "about "+usd(SY/IY)+" per image · "+int(IY)+" images");
+    kpi("Average of all images", hm(ALL.min), "about "+usd(SY/IY)+" per image · "+int(IY)+" images");
   el("roundTable").innerHTML =
     '<tr><th>Client code</th><th class="num">Round 1 images</th><th class="num">Round 1 time / image</th><th class="num">Round 2+ images</th><th class="num">Round 2+ time / image</th><th class="num">All lines time / image</th></tr>' +
     A.map(function(a){
