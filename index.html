@@ -418,7 +418,8 @@
   var DG = A.filter(function(a){return a.type==="Digital";});
   el("quick").innerHTML = [
     "<b>Potion takes about "+hm(ALL.min)+" per image on average,</b> and it costs about "+usd2(SY/IY)+" per image ($12 per hour). That covers "+int(IY)+" images, January to September.",
-    "<b>VS Regular: "+hm(GR["VS Regular"].min)+" per image ("+usd2(GR["VS Regular"].spend/GR["VS Regular"].images)+"). Pink: "+hm(GR["Pink"].min)+" per image ("+usd2(GR["Pink"].spend/GR["Pink"].images)+").</b> VS Regular is 12601 (Print), 12603 (Digital) and 12608 (Global). Pink is 98852 (Print) and 98853 (Digital). Each client code is below.",
+    "<b>VS Regular: "+hm(GR["VS Regular"].min)+" per image ("+usd2(GR["VS Regular"].spend/GR["VS Regular"].images)+"). Pink: "+hm(GR["Pink"].min)+" per image ("+usd2(GR["Pink"].spend/GR["Pink"].images)+").</b>",
+    "<b>The accounts.</b> VS Regular is 12601 (Print), 12603 (Digital) and 12608 (Global). Pink is 98852 (Print) and 98853 (Digital).",
     "<b>A new image takes about "+hm(rmin("r1"))+" ("+usd(RT.r1[1]*12/RT.r1[0])+"); a correction round about "+hm(rmin("r2"))+" ("+usd(RT.r2[1]*12/RT.r2[0])+").</b>",
     "<b>Total: "+int(ALL.hours)+" hours and "+usd(SY)+".</b> VS Regular is "+Math.round(GR["VS Regular"].hours/ALL.hours*100)+"% of the hours and Pink "+Math.round(GR["Pink"].hours/ALL.hours*100)+"%. The two Digital accounts are "+Math.round(digH)+"% of all hours.",
     "<b>Not every order goes to Potion.</b> "+Math.round(DG.reduce(function(x,a){return x+a.sent;},0)/DG.reduce(function(x,a){return x+a.orders;},0)*100)+"% of Digital orders went to Potion; the Print accounts are mostly done in-house. Pick-ups and CGI are done at Duggal."
